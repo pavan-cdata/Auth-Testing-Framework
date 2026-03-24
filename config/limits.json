@@ -1,0 +1,5 @@
+{
+    "max_cases_per_scheme": 25,
+    "query": "SELECT * FROM Customers LIMIT 1",
+    "timeout_seconds": 30
+}

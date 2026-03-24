@@ -1,0 +1,4 @@
+jpype1
+requests
+openpyxl
+groq
