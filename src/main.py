@@ -1,6 +1,6 @@
 import argparse
 import jpype
-from driver_inspector import start_jvm, get_auth_schemes
+from driver_inspector import start_jvm, discover_driver_class, get_auth_schemes
 from credential_fetcher import fetch_credentials
 from test_case_generator import generate_cases_with_ai
 from executor import test_connection
@@ -75,7 +75,9 @@ def main():
     print(f"[*] Starting JVM with {jar_path}...")
     start_jvm(jar_path)
 
-    driver_class = jpype.JClass(f"cdata.jdbc.{driver}.{driver.capitalize()}Driver")
+    driver_class_name = discover_driver_class()
+    print(f"[+] Auto-discovered driver class: {driver_class_name}")
+    driver_class = jpype.JClass(driver_class_name)
 
     print("[*] Discovering auth schemes...")
     schemes = get_auth_schemes(driver_class)
