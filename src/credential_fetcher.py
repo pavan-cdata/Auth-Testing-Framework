@@ -1,6 +1,12 @@
 import subprocess
 import json
 
+# 1Password system/meta fields that should never be used as JDBC credentials
+_SKIP_LABELS = {
+    "notesplain", "notes", "username", "account", "account[email]",
+    "totp", "tags", "title", "url", "website",
+}
+
 
 def fetch_credentials(item_name):
     result = subprocess.run(
@@ -16,7 +22,7 @@ def fetch_credentials(item_name):
 
     creds = {}
 
-    # Try parsing JDBC connection string from notes field
+    # Try parsing JDBC connection string from notes field first
     for field in data.get("fields", []):
         label = field.get("label", "")
         value = field.get("value", "")
@@ -24,11 +30,11 @@ def fetch_credentials(item_name):
             creds = parse_jdbc_connection_string(value)
             return creds
 
-    # Fallback: use labeled fields
+    # Fallback: use labeled fields, skipping system/meta fields
     for field in data.get("fields", []):
-        label = field.get("label")
-        value = field.get("value")
-        if label and value:
+        label = field.get("label", "")
+        value = field.get("value", "")
+        if label and value and label.lower() not in _SKIP_LABELS:
             creds[label] = value
 
     return creds
